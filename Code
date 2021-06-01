@@ -1,0 +1,76 @@
+import math
+
+viscosity = 0.000018205
+rho_oil = 917
+rho_air = 1.205
+distance_bet_plates = 0.015
+b = 8.2e-3
+P = 1.01e5
+Voltage = 540
+
+
+class Oil_drop:
+    def __init__(self):
+        print("All values in S.I. unit")
+        self.time_to_move_down = float(input('Time taken by particle to drop in absence of electric field (Sec) = '))
+        self.time_to_move_up = float(input("Time taken by particle to move up in presence of electric field (Sec) = "))
+
+    def velocity_up(self):
+        return 2e-3 / self.time_to_move_up
+
+    def velocity_down(self):
+        return 2e-3 / self.time_to_move_down
+
+    def radius_before(self):
+        m = 2 * 9.8 * (rho_oil - rho_air)
+        c = 9 * viscosity * self.velocity_down()
+        return math.sqrt(c / m)
+
+    def radius_after(self):
+        i = (1 + (b / (P * self.radius_before())))
+        eff_viscosity = viscosity * (1 / i)
+        x = (9 * eff_viscosity * self.velocity_down()) / (2 * 9.8 * rho_oil)
+        return math.sqrt((4.059e-8 ** 2) + x) - 1.059e-8
+
+    def weight_calculation(self):
+        return (4 / 3) * math.pi * (self.radius_after() ** 3) * (rho_oil - rho_air) * 9.8
+
+    def charge_calculation(self):
+        front = ((self.velocity_up() / self.velocity_down()) + 1)
+        return front * (self.weight_calculation() / (Voltage / distance_bet_plates))
+
+    def show(self):
+        print(f"Velocity of falling drop = {str(self.velocity_down())} m/s\n")
+        print(f"Velocity of rising drop  = {str(self.velocity_up())} m/s \n")
+        print(f" Radius of particle before viscosity correction, a =  {str(self.radius_before())} m\n")
+        print(f" Radius of particle after viscosity correction, r =  {str(self.radius_after())} m\n")
+        print("---" * 30)
+        print(f" Apparent weight of the particle , W = {str(self.weight_calculation())} kg\n")
+        print(f" The electric field applied between the plates , E = {str(Voltage / distance_bet_plates)} V/m\n")
+        print(f" The charge on the particle is , Q = {float(self.charge_calculation())} Coulomb\n")
+        print("-------" * 10)
+        print(" Number of electrons , N = " + str(self.charge_calculation() / 1.67e-19))
+
+
+obj = Oil_drop()
+obj.velocity_up()
+obj.velocity_down()
+obj.radius_before()
+obj.radius_after()
+obj.weight_calculation()
+obj.charge_calculation()
+obj.show()
+
+const = '''
+                       where,
+                         b = 8.2e3 Pa , is constant
+                         g = 9.8 m/s^2 , acceleration due to gravity
+                         P = 1.081e5 Pa , is atmospheric pressure
+                         Viscosity of air at 20 degree celsius = 0.000018205kg/m-s
+                         Density of the Olive oil at 20 degree celsius = 917 kg/m^3
+                         Density of the air at 20 degree celsius = 1.205 kg/m^3
+                         Distance between two plates = 1.4 cm = 0.014 m
+                         Applied voltage = 540 V
+'''
+
+print(const)
